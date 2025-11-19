@@ -28,7 +28,6 @@
     </form>
   </div>
 
-  <!-- Firebase + Auth via CDN (modo módulo) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
@@ -55,12 +54,10 @@
         return;
       }
 
-      // Transformamos "marcelo" em "marcelo@gestor-promocar.com"
       const email = `${usuario}@gestor-promocar.com`;
 
       try {
         await signInWithEmailAndPassword(auth, email, senha);
-        // Marca sessão local para compatibilidade com o painel atual
         localStorage.setItem('gp_logged_in', '1');
         window.location.href = 'index.html';
       } catch (err) {
@@ -69,11 +66,9 @@
       }
     });
 
-    // Se já estiver logado no Firebase, pula o login
     onAuthStateChanged(auth, (user) => {
       if (user) {
         localStorage.setItem('gp_logged_in', '1');
-        // Se já estiver no login, vai direto pro painel
         if (location.pathname.endsWith('login.html')) {
           window.location.href = 'index.html';
         }
