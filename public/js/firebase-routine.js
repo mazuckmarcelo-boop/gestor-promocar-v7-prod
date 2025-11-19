@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
+// Mesmo config do seu projeto gestor-promocar
 const firebaseConfig = {
   apiKey: "AIzaSyB3lg9bGROqCtrrKK3Oz18fNre2J0WiKPQ",
   authDomain: "gestor-promocar.firebaseapp.com",
@@ -10,9 +11,11 @@ const firebaseConfig = {
   appId: "1:275169819326:web:5f977576f8cc8edc057cef"
 };
 
-const appFB = initializeApp(firebaseConfig, "rotina-app");
-const db = getFirestore(appFB);
+// Inicializa um app Firebase só para a rotina (não mexe no login)
+const rotinaApp = initializeApp(firebaseConfig, "rotina-app");
+const db = getFirestore(rotinaApp);
 
+// ID do documento do dia: AAAA-MM-DD
 function getIdDiaHoje() {
   const hoje = new Date();
   const ano = hoje.getFullYear();
@@ -21,68 +24,56 @@ function getIdDiaHoje() {
   return `${ano}-${mes}-${dia}`;
 }
 
-function lerContadoresDoDOM() {
-  const pegaNumero = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return 0;
-    const v = parseInt((el.textContent || el.innerText || "0").replace(/\D+/g, "")) || 0;
-    return v;
-  };
-
-  return {
-    pendentes: pegaNumero("status-dia-pendentes"),
-    concluidas: pegaNumero("status-dia-concluidas"),
-    total: pegaNumero("status-dia-total"),
-  };
-}
-
-function aplicarNoDOMRotina(data) {
-  const pendEl = document.getElementById("status-dia-pendentes");
-  const concEl = document.getElementById("status-dia-concluidas");
-  const totEl  = document.getElementById("status-dia-total");
-
-  if (pendEl) pendEl.textContent = data.pendentes ?? 0;
-  if (concEl) concEl.textContent = data.concluidas ?? 0;
-  if (totEl)  totEl.textContent  = data.total ?? 0;
-}
-
-async function loadRotinaDia() {
+// Carrega o estado da rotina do Firestore e "injeta" no app.js
+async function carregarEstadoRotina() {
   try {
     const idDia = getIdDiaHoje();
     const ref = doc(db, "rotina", idDia);
     const snap = await getDoc(ref);
-    let data;
-    if (!snap.exists()) {
-      data = { pendentes: 0, concluidas: 0, total: 0 };
-      await setDoc(ref, data);
+
+    if (snap.exists()) {
+      const data = snap.data();
+      const estado = data.estado || {};
+      if (window.__gpSetEstadoRotina) {
+        window.__gpSetEstadoRotina(estado);
+      }
     } else {
-      data = snap.data();
-      data.pendentes = data.pendentes ?? 0;
-      data.concluidas = data.concluidas ?? 0;
-      data.total = data.total ?? 0;
+      // Se não existir, pega o estado atual (localStorage / padrão) e cria
+      let estadoInicial = {};
+      if (window.__gpGetEstadoRotina) {
+        estadoInicial = window.__gpGetEstadoRotina();
+      }
+      await setDoc(ref, { estado: estadoInicial });
     }
-    aplicarNoDOMRotina(data);
   } catch (e) {
     console.error("Erro ao carregar rotina do dia no Firestore:", e);
   }
 }
 
-async function salvarRotinaDia() {
+// Salva o estado atual da rotina no Firestore
+async function salvarEstadoRotina() {
   try {
+    if (!window.__gpGetEstadoRotina) return;
+
+    const estadoAtual = window.__gpGetEstadoRotina();
     const idDia = getIdDiaHoje();
     const ref = doc(db, "rotina", idDia);
-    const contadores = lerContadoresDoDOM();
-    await setDoc(ref, contadores, { merge: true });
+
+    await setDoc(ref, { estado: estadoAtual }, { merge: true });
+    // console.log("Rotina do dia salva no Firestore");
   } catch (e) {
     console.error("Erro ao salvar rotina do dia no Firestore:", e);
   }
 }
 
-function iniciarIntegracaoRotina() {
-  loadRotinaDia();
+function iniciarSincronizacaoRotina() {
+  // 1) Ao carregar a página, busca o estado do dia no Firestore
+  carregarEstadoRotina();
+
+  // 2) A cada 5s, envia o estado atual da rotina
   setInterval(() => {
-    salvarRotinaDia();
+    salvarEstadoRotina();
   }, 5000);
 }
 
-window.addEventListener("load", iniciarIntegracaoRotina);
+window.addEventListener("load", iniciarSincronizacaoRotina);
