@@ -52,6 +52,25 @@ function hojeTexto(){const d=new Date();return d.toLocaleDateString("pt-BR",{wee
 function horaTexto(){const d=new Date();return d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});}
 
 let estadoRotina = lerLS(STORAGE_KEYS.rotina, {});
+// ==== Integração com Firestore – helper global ====
+// Permite que outros scripts (como firebase-routine.js) leiam e escrevam
+// o estado da rotina sem quebrar o app.
+window.__gpGetEstadoRotina = function () {
+  return { ...estadoRotina }; // cópia rasa
+};
+
+window.__gpSetEstadoRotina = function (novoEstado) {
+  estadoRotina = novoEstado || {};
+  salvarLS(STORAGE_KEYS.rotina, estadoRotina);
+  // Recria a lista de tarefas e recalcula o dashboard
+  if (typeof inicializarRotinaDOM === "function") {
+    inicializarRotinaDOM();
+  }
+  if (typeof atualizarDashboard === "function") {
+    atualizarDashboard();
+  }
+};
+
 let estadoVideos = lerLS(STORAGE_KEYS.videos, {});
 let estadoAnuncios = lerLS(STORAGE_KEYS.anuncios, {});
 let estadoPortais = lerLS(STORAGE_KEYS.portais, []);
