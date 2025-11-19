@@ -1,3 +1,4 @@
+if(!localStorage.getItem("gp_logged_in")){ window.location="login.html"; }
 // JS principal do Gestor Promocar v6 (resumido)
 
 const STORAGE_KEYS = {
@@ -371,28 +372,4 @@ document.addEventListener("DOMContentLoaded",()=>{
   setupModalVenda();
   atualizarDashboard();
   mostrarView("dashboard");
-});
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-   const rows=document.querySelectorAll("#"+tableId+" tr");
-   let csv=[];
-   rows.forEach(r=>{
-     let cols=r.querySelectorAll("th,td");
-     let line=[];
-     cols.forEach(c=>line.push(c.innerText));
-     csv.push(line.join(","));
-   });
-   const blob=new Blob([csv.join("\n")],{type:"text/csv"});
-   const a=document.createElement("a");
-   a.href=URL.createObjectURL(blob);
-   a.download=filename;
-   a.click();
- }
-
-
-
-
-
-
 });
