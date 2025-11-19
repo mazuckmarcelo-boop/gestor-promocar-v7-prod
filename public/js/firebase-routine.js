@@ -11,9 +11,12 @@ const firebaseConfig = {
   appId: "1:275169819326:web:5f977576f8cc8edc057cef"
 };
 
-// Inicializa um app Firebase só para a rotina (não mexe no login)
-const rotinaApp = initializeApp(firebaseConfig, "rotina-app");
-const db = getFirestore(rotinaApp);
+// Usa o MESMO app Firebase inicializado no login (app.js)
+import { getApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const app = getApp();
+const db = getFirestore(app);
 
 // ID do documento do dia: AAAA-MM-DD
 function getIdDiaHoje() {
