@@ -1,79 +1,28 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Login - Gestor Promocar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./css/style.css" />
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8"/><title>Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="./css/style.css"/>
 </head>
 <body class="login-body">
-  <div class="login-wrapper">
-    <form class="login-card" id="login-form">
-      <h2 class="login-title">Gestor Promocar</h2>
-      <input
-        id="usuario"
-        class="login-input"
-        placeholder="Usuário"
-        autocomplete="username"
-      />
-      <input
-        id="senha"
-        type="password"
-        class="login-input"
-        placeholder="Senha"
-        autocomplete="current-password"
-      />
-      <div id="login-error" class="login-error"></div>
-      <button class="login-button" type="submit">Entrar</button>
-    </form>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-
-    const firebaseConfig = {"apiKey": "AIzaSyB3lg9bGROqCtrrKK3Oz18fNre2J0WiKPQ", "authDomain": "gestor-promocar.firebaseapp.com", "projectId": "gestor-promocar", "storageBucket": "gestor-promocar.firebasestorage.app", "messagingSenderId": "275169819326", "appId": "1:275169819326:web:5f977576f8cc8edc057cef"};
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const form = document.getElementById('login-form');
-    const usuarioInput = document.getElementById('usuario');
-    const senhaInput = document.getElementById('senha');
-    const errorBox = document.getElementById('login-error');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorBox.textContent = "";
-
-      const usuario = (usuarioInput.value || "").trim();
-      const senha = senhaInput.value || "";
-
-      if (!usuario || !senha) {
-        errorBox.textContent = "Preencha usuário e senha.";
-        return;
-      }
-
-      const email = `${usuario}@gestor-promocar.com`;
-
-      try {
-        await signInWithEmailAndPassword(auth, email, senha);
-        localStorage.setItem('gp_logged_in', '1');
-        window.location.href = 'index.html';
-      } catch (err) {
-        console.error(err);
-        errorBox.textContent = "Usuário ou senha inválidos.";
-      }
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        localStorage.setItem('gp_logged_in', '1');
-        if (location.pathname.endsWith('login.html')) {
-          window.location.href = 'index.html';
-        }
-      }
-    });
-  </script>
-</body>
-</html>
+<div class="login-wrapper">
+<form class="login-card" id="login-form">
+<h2 class="login-title">Gestor Promocar</h2>
+<input id="usuario" class="login-input" placeholder="Usuário"/>
+<input id="senha" type="password" class="login-input" placeholder="Senha"/>
+<div id="login-error" class="login-error"></div>
+<button class="login-button">Entrar</button>
+</form></div>
+<script>
+document.getElementById('login-form').addEventListener('submit',e=>{
+ e.preventDefault();
+ const u=document.getElementById('usuario').value.trim();
+ const s=document.getElementById('senha').value;
+ if(u==='marcelo' && s==='Campeao2024!'){
+   localStorage.setItem('gp_logged_in','1');
+   window.location='index.html';
+ } else {
+   document.getElementById('login-error').textContent='Usuário ou senha inválidos.';
+ }
+});
+</script>
+</body></html>

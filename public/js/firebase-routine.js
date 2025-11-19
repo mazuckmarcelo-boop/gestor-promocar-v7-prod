@@ -1,12 +1,7 @@
-// =========================
-// 🔥 IMPORTS DO FIREBASE
-// =========================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-// =========================
-// 🔥 CONFIGURAÇÃO DO FIREBASE
-// =========================
+// Configuração do Firebase - Gestor Promocar
 const firebaseConfig = {
   apiKey: "AIzaSyB3lg9bGROqCtrrKK3Oz18fNre2J0WiKPQ",
   authDomain: "gestor-promocar.firebaseapp.com",
@@ -16,15 +11,11 @@ const firebaseConfig = {
   appId: "1:275169819326:web:5f977576f8cc8edc057cef"
 };
 
-// =========================
-// 🔥 INICIALIZA APENAS 1 APP
-// =========================
+// Inicializa o app Firebase (apenas nesta página)
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// =========================
-// 🗓️ FUNÇÃO: PEGAR ID DO DIA (AAAA-MM-DD)
-// =========================
+// Gera ID do documento do dia no formato AAAA-MM-DD
 function getIdDiaHoje() {
   const hoje = new Date();
   const ano = hoje.getFullYear();
@@ -33,9 +24,7 @@ function getIdDiaHoje() {
   return `${ano}-${mes}-${dia}`;
 }
 
-// =========================
-// 📥 CARREGAR ESTADO DA ROTINA
-// =========================
+// Carrega o estado da rotina do Firestore e injeta no app.js
 async function carregarEstadoRotina() {
   try {
     const idDia = getIdDiaHoje();
@@ -43,20 +32,16 @@ async function carregarEstadoRotina() {
     const snap = await getDoc(ref);
 
     if (snap.exists()) {
-      // Se existe no Firestore → injeta no app.js
       const data = snap.data();
       const estado = data.estado || {};
-
       if (window.__gpSetEstadoRotina) {
         window.__gpSetEstadoRotina(estado);
       }
     } else {
-      // Cria documento novo
       let estadoInicial = {};
       if (window.__gpGetEstadoRotina) {
         estadoInicial = window.__gpGetEstadoRotina();
       }
-
       await setDoc(ref, { estado: estadoInicial });
     }
   } catch (e) {
@@ -64,9 +49,7 @@ async function carregarEstadoRotina() {
   }
 }
 
-// =========================
-// 💾 SALVAR ESTADO DA ROTINA
-// =========================
+// Salva o estado atual da rotina no Firestore
 async function salvarEstadoRotina() {
   try {
     if (!window.__gpGetEstadoRotina) return;
@@ -81,15 +64,10 @@ async function salvarEstadoRotina() {
   }
 }
 
-// =========================
-// 🔄 SINCRONIZAÇÃO AUTOMÁTICA
-// =========================
+// Inicializa sincronização
 function iniciarSincronizacaoRotina() {
   carregarEstadoRotina();
-
-  setInterval(() => {
-    salvarEstadoRotina();
-  }, 5000);
+  setInterval(salvarEstadoRotina, 5000);
 }
 
 window.addEventListener("load", iniciarSincronizacaoRotina);
