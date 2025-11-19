@@ -373,3 +373,28 @@ document.addEventListener("DOMContentLoaded",()=>{
   atualizarDashboard();
   mostrarView("dashboard");
 });
+
+
+/* Firestore rotina integration (basic placeholder) */
+import { getFirestore, doc, getDoc, setDoc } 
+  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const db = getFirestore();
+
+async function loadRotinaDia() {
+  const hoje = new Date().toISOString().slice(0,10);
+  const ref = doc(db, "rotina", hoje);
+  const snap = await getDoc(ref);
+  let data;
+  if(!snap.exists()) {
+    data = {pendentes:0, concluidas:0, total:0};
+    await setDoc(ref, data);
+  } else {
+    data = snap.data();
+  }
+  document.getElementById("status-dia-pendentes").innerText = data.pendentes;
+  document.getElementById("status-dia-concluidas").innerText = data.concluidas;
+  document.getElementById("status-dia-total").innerText = data.total;
+}
+
+window.addEventListener("load", loadRotinaDia);
