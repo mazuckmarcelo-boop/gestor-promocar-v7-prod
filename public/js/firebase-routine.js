@@ -1,7 +1,12 @@
+// =========================
+// 🔥 IMPORTS DO FIREBASE
+// =========================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-// Mesmo config do seu projeto gestor-promocar
+// =========================
+// 🔥 CONFIGURAÇÃO DO FIREBASE
+// =========================
 const firebaseConfig = {
   apiKey: "AIzaSyB3lg9bGROqCtrrKK3Oz18fNre2J0WiKPQ",
   authDomain: "gestor-promocar.firebaseapp.com",
@@ -11,14 +16,15 @@ const firebaseConfig = {
   appId: "1:275169819326:web:5f977576f8cc8edc057cef"
 };
 
-// Usa o MESMO app Firebase inicializado no login (app.js)
-import { getApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-const app = getApp();
+// =========================
+// 🔥 INICIALIZA APENAS 1 APP
+// =========================
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ID do documento do dia: AAAA-MM-DD
+// =========================
+// 🗓️ FUNÇÃO: PEGAR ID DO DIA (AAAA-MM-DD)
+// =========================
 function getIdDiaHoje() {
   const hoje = new Date();
   const ano = hoje.getFullYear();
@@ -27,7 +33,9 @@ function getIdDiaHoje() {
   return `${ano}-${mes}-${dia}`;
 }
 
-// Carrega o estado da rotina do Firestore e "injeta" no app.js
+// =========================
+// 📥 CARREGAR ESTADO DA ROTINA
+// =========================
 async function carregarEstadoRotina() {
   try {
     const idDia = getIdDiaHoje();
@@ -35,17 +43,20 @@ async function carregarEstadoRotina() {
     const snap = await getDoc(ref);
 
     if (snap.exists()) {
+      // Se existe no Firestore → injeta no app.js
       const data = snap.data();
       const estado = data.estado || {};
+
       if (window.__gpSetEstadoRotina) {
         window.__gpSetEstadoRotina(estado);
       }
     } else {
-      // Se não existir, pega o estado atual (localStorage / padrão) e cria
+      // Cria documento novo
       let estadoInicial = {};
       if (window.__gpGetEstadoRotina) {
         estadoInicial = window.__gpGetEstadoRotina();
       }
+
       await setDoc(ref, { estado: estadoInicial });
     }
   } catch (e) {
@@ -53,7 +64,9 @@ async function carregarEstadoRotina() {
   }
 }
 
-// Salva o estado atual da rotina no Firestore
+// =========================
+// 💾 SALVAR ESTADO DA ROTINA
+// =========================
 async function salvarEstadoRotina() {
   try {
     if (!window.__gpGetEstadoRotina) return;
@@ -63,17 +76,17 @@ async function salvarEstadoRotina() {
     const ref = doc(db, "rotina", idDia);
 
     await setDoc(ref, { estado: estadoAtual }, { merge: true });
-    // console.log("Rotina do dia salva no Firestore");
   } catch (e) {
     console.error("Erro ao salvar rotina do dia no Firestore:", e);
   }
 }
 
+// =========================
+// 🔄 SINCRONIZAÇÃO AUTOMÁTICA
+// =========================
 function iniciarSincronizacaoRotina() {
-  // 1) Ao carregar a página, busca o estado do dia no Firestore
   carregarEstadoRotina();
 
-  // 2) A cada 5s, envia o estado atual da rotina
   setInterval(() => {
     salvarEstadoRotina();
   }, 5000);
