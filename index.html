@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script>
+if(!localStorage.getItem('gp_logged_in')){ window.location='login.html'; }
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor Promocar</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-logo">
+      <span class="app-logo-mark">P</span>
+      <span class="app-logo-text">Gestor Promocar</span>
+    </div>
+    <div class="app-header-info">
+      <div id="header-date"></div>
+      <div id="header-time"></div>
+    </div>
+  </header>
+
+  <main id="view-dashboard" class="view active-view">
+    <section class="grid-2">
+      <div class="card">
+        <div class="card-title">
+          <span>Status do dia</span>
+          <small id="status-dia-label">Rotina de hoje</small>
+        </div>
+        <div class="card-content">
+          <div class="progress-wrapper">
+            <div class="progress-label">
+              <span>Tarefas concluídas</span>
+              <span id="status-dia-percent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div id="status-dia-bar" class="progress-fill"></div>
+            </div>
+          </div>
+          <ul class="mini-list">
+            <li><span>Pendentes:</span> <strong id="status-dia-pendentes">0</strong></li>
+            <li><span>Concluídas:</span> <strong id="status-dia-concluidas">0</strong></li>
+            <li><span>Total:</span> <strong id="status-dia-total">0</strong></li>
+          </ul>
+          <button class="btn-outline" data-nav="rotina">Ir para rotina</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Meta do mês</span>
+          <small id="status-meta-mes-label">Meta configurada</small>
+        </div>
+        <div class="card-content">
+          <div class="meta-number">
+            <span>Meta:</span>
+            <strong id="meta-total">50</strong> carros
+          </div>
+          <div class="meta-number">
+            <span>Vendidos:</span>
+            <strong id="meta-vendidos">0</strong> carros
+          </div>
+          <div class="meta-number">
+            <span>Faltam:</span>
+            <strong id="meta-faltam">50</strong>
+          </div>
+          <div class="progress-wrapper">
+            <div class="progress-label">
+              <span>Progresso</span>
+              <span id="meta-percent">0%</span>
+            </div>
+            <div class="progress-bar meta-bar">
+              <div id="meta-bar-fill" class="progress-fill meta-fill"></div>
+            </div>
+          </div>
+          <button class="btn-outline" data-nav="equipe">Ver painel da equipe</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="card">
+        <div class="card-title">
+          <span>Equipe – Ranking rápido</span>
+          <small>Vendas no mês atual</small>
+        </div>
+        <div class="card-content">
+          <ol id="dash-ranking" class="ranking-list"></ol>
+          <button class="btn-outline" data-nav="equipe">Abrir painel completo</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Portais & custos</span>
+          <small>Vencimentos próximos e CPV</small>
+        </div>
+        <div class="card-content">
+          <ul id="dash-portais" class="mini-list"></ul>
+          <div class="meta-number">
+            <span>Total mensal:</span>
+            <strong id="dash-portais-total">R$ 0,00</strong>
+          </div>
+          <button class="btn-outline" data-nav="portais">Ir para portais</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-home" class="view">
+    <section class="home-grid">
+      <button class="home-card" data-nav="rotina">
+        <span class="home-icon">📅</span>
+        <span class="home-title">Rotina do dia</span>
+        <span class="home-sub">Checklist completo</span>
+      </button>
+      <button class="home-card" data-nav="videos">
+        <span class="home-icon">🎥</span>
+        <span class="home-title">Vídeos</span>
+        <span class="home-sub">Produção + ideias</span>
+      </button>
+      <button class="home-card" data-nav="anuncios">
+        <span class="home-icon">📤</span>
+        <span class="home-title">Anúncios</span>
+        <span class="home-sub">AutoConf + Marketplace</span>
+      </button>
+      <button class="home-card" data-nav="portais">
+        <span class="home-icon">🌐</span>
+        <span class="home-title">Portais</span>
+        <span class="home-sub">Custos & vencimentos</span>
+      </button>
+      <button class="home-card" data-nav="equipe">
+        <span class="home-icon">👥</span>
+        <span class="home-title">Equipe</span>
+        <span class="home-sub">Leads, vendas, meta</span>
+      </button>
+      <button class="home-card" data-nav="config">
+        <span class="home-icon">⚙️</span>
+        <span class="home-title">Configurações</span>
+        <span class="home-sub">Meta, reset, etc.</span>
+      </button>
+    </section>
+  </main>
+
+  <main id="view-rotina" class="view">
+    <section class="card">
+      <div class="card-title">
+        <span>Rotina da loja</span>
+        <small>Gestão de tempo – sua base</small>
+      </div>
+      <div class="card-content">
+        <ul id="rotina-list" class="task-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-videos" class="view">
+    <section class="card">
+      <div class="card-title">
+        <span>Vídeos do dia</span>
+        <small>Checklist pra não esquecer</small>
+      </div>
+      <div class="card-content">
+        <ul class="task-list">
+          <li>
+            <label>
+              <input type="checkbox" class="js-video-check" data-id="manha" />
+              Vídeos da manhã (3–5)
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" class="js-video-check" data-id="tarde" />
+              Vídeos da tarde (3–5)
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" class="js-video-check" data-id="fechamento" />
+              Vídeo de fechamento
+            </label>
+          </li>
+        </ul>
+        <p class="hint">
+          Use o app só como checklist — gravação/edição continua no seu fluxo normal.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-anuncios" class="view">
+    <section class="card">
+      <div class="card-title">
+        <span>Fluxo de anúncios</span>
+        <small>AutoConf + portais + marketplace</small>
+      </div>
+      <div class="card-content">
+        <ul class="task-list" id="anuncios-list">
+          <li><label><input type="checkbox" class="js-anuncio-check" data-id="autoconf" /> Subir fotos no AutoConf</label></li>
+          <li><label><input type="checkbox" class="js-anuncio-check" data-id="portais" /> Publicar nos portais</label></li>
+          <li><label><input type="checkbox" class="js-anuncio-check" data-id="site" /> Conferir anúncio no site</label></li>
+          <li><label><input type="checkbox" class="js-anuncio-check" data-id="marketplace" /> Subir no Marketplace</label></li>
+        </ul>
+        <div class="button-row">
+          <a class="btn" href="https://app.autoconf.com.br/" target="_blank">Abrir AutoConf</a>
+          <a class="btn-outline" href="https://wa.me/5534999201767" target="_blank">WhatsApp comercial</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-portais" class="view">
+    <section class="card">
+      <div class="card-title">
+        <span>Portais da loja</span>
+        <small>Custos, vencimentos e CPV básico</small>
+      </div>
+      <div class="card-content">
+        <div class="portais-actions">
+          <button id="btn-add-portal" class="btn-sm">+ Adicionar portal</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="portais-table">
+            <thead>
+              <tr>
+                <th>Portal</th>
+                <th>Custo/mês (R$)</th>
+                <th>Vencimento</th>
+                <th>Leads</th>
+                <th>Vendas</th>
+                <th>CPV</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="portais-body"></tbody>
+          </table>
+        </div>
+        <div class="meta-number">
+          <span>Total mensal:</span>
+          <strong id="portais-total">R$ 0,00</strong>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-equipe" class="view">
+    <section class="card">
+      <div class="card-title">
+        <span>Equipe de vendas</span>
+        <small>Leads, visitas, vendas e conversão</small>
+      </div>
+      <div class="card-content equipe-grid" id="equipe-cards"></div>
+    </section>
+  </main>
+
+  <main id="view-config" class="view">
+    <section class="card">
+      <div class="card-title">
+        <span>Configurações</span>
+        <small>Meta, mês atual e reset</small>
+      </div>
+      <div class="card-content config-content">
+        <label class="config-item">
+          <span>Meta mensal de carros</span>
+          <input type="number" id="config-meta" min="1" />
+        </label>
+        <label class="config-item">
+          <span>Mês de referência</span>
+          <input type="month" id="config-mes" />
+        </label>
+        <button id="btn-salvar-config" class="btn">Salvar configurações</button>
+        <hr />
+        <button id="btn-reset-dia" class="btn-outline-danger">Resetar rotina do dia</button>
+        <button id="btn-reset-equipe" class="btn-outline-danger">Resetar números da equipe</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-backdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <h3>Origem da venda</h3>
+      <p>De onde veio esta venda?</p>
+      <select id="modal-origem-select">
+        <option value="">Selecione...</option>
+        <option>Webmotors</option>
+        <option>OLX</option>
+        <option>Mobiauto</option>
+        <option>Mercado Livre</option>
+        <option>UsadosBR</option>
+        <option>iCarros</option>
+        <option>Facebook Ads</option>
+        <option>Tráfego Pago</option>
+        <option>Marketplace</option>
+        <option>Porta / Loja</option>
+        <option>Indicação</option>
+        <option>Orgânico</option>
+        <option value="outro">Outro (digitar)</option>
+      </select>
+      <input id="modal-origem-outro" class="hidden" type="text" placeholder="Digite a origem" />
+      <div class="modal-actions">
+        <button id="modal-cancelar" class="btn-outline">Cancelar</button>
+        <button id="modal-confirmar" class="btn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active-nav" data-view="dashboard">
+      <span>📊</span>
+      <small>Dashboard</small>
+    </button>
+    <button class="nav-btn" data-view="home">
+      <span>🏠</span>
+      <small>Home</small>
+    </button>
+    <button class="nav-btn" data-view="rotina">
+      <span>📅</span>
+      <small>Rotina</small>
+    </button>
+    <button class="nav-btn" data-view="portais">
+      <span>🌐</span>
+      <small>Portais</small>
+    </button>
+    <button class="nav-btn" data-view="equipe">
+      <span>👥</span>
+      <small>Equipe</small>
+    </button>
+    <button class="nav-btn" data-view="config">
+      <span>⚙️</span>
+      <small>Config</small>
+    </button>
+  </nav>
+
+  <script src="js/app.js"></script>
+<script type="module" src="./js/firebase-routine.js"></script></body>
+</html>
