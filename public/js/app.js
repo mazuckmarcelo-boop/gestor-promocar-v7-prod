@@ -72,6 +72,22 @@ window.__gpSetEstadoRotina = function (novoEstado) {
 let estadoVideos = lerLS(STORAGE_KEYS.videos, {});
 let estadoAnuncios = lerLS(STORAGE_KEYS.anuncios, {});
 let estadoPortais = lerLS(STORAGE_KEYS.portais, []);
+// Helpers globais para integração dos portais com Firestore
+window.__gpGetPortais = function () {
+  return Array.isArray(estadoPortais) ? estadoPortais.map(p => ({ ...p })) : [];
+};
+
+window.__gpSetPortais = function (novos) {
+  estadoPortais = Array.isArray(novos) ? novos : [];
+  salvarLS(STORAGE_KEYS.portais, estadoPortais);
+  if (typeof renderPortaisTabela === "function") {
+    renderPortaisTabela();
+  }
+  if (typeof atualizarDashboard === "function") {
+    atualizarDashboard();
+  }
+};
+
 let estadoEquipe = lerLS(STORAGE_KEYS.equipe, {});
 let estadoSettings = lerLS(STORAGE_KEYS.settings, {
   metaMensal: 50,
@@ -160,8 +176,13 @@ function renderPortaisTabela(){
       inp.addEventListener("change",()=>{
         let val=inp.value;
         if(["custo","leads","vendas"].includes(campo)) val=parseFloat(val.replace(",","."))||0;
-        estadoPortais[idx][campo]=val; salvarLS(STORAGE_KEYS.portais,estadoPortais);
-        renderPortaisTabela(); atualizarDashboard();
+        estadoPortais[idx][campo]=val; 
+        salvarLS(STORAGE_KEYS.portais,estadoPortais);
+        renderPortaisTabela(); 
+        atualizarDashboard();
+        if (window.__gpSyncPortaisNow) {
+          window.__gpSyncPortaisNow();
+        }
       });
       td.appendChild(inp); return td;
     }
@@ -206,6 +227,9 @@ function renderPortaisTabela(){
       salvarLS(STORAGE_KEYS.portais, estadoPortais);
       renderPortaisTabela();
       atualizarDashboard();
+      if (window.__gpSyncPortaisNow) {
+        window.__gpSyncPortaisNow();
+      }
     });
 
     tdStatus.appendChild(btn);
