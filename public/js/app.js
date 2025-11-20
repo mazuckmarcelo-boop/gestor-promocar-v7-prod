@@ -16,7 +16,7 @@ const VENDEDORES_INICIAIS = [
   { id: "ezequiel", nome: "Ezequiel" },
   { id: "gabriel", nome: "Gabriel" },
   { id: "fernando", nome: "Fernando" },
-  { id: "fernanda", nome: "Fernanda (SDR)" },
+  { id: "sdr", nome: "SDR" },
 ];
 
 const ROTINA_PADRAO = [
@@ -247,7 +247,7 @@ function inicializarEquipeSeVazio(){
     estadoEquipe={};
     VENDEDORES_INICIAIS.forEach(v=>{
       estadoEquipe[v.id]={nome:v.nome,leads:0,visitas:0,vendas:0};
-      if (v.nome.includes("(SDR)")) {
+      if (v.id === "sdr") {
         estadoEquipe[v.id].vendasSDR = 0;
       }
     });
@@ -286,7 +286,7 @@ function renderEquipeCards(){
     m3.innerHTML = `<span>Vendas:</span><strong>${d.vendas || 0}</strong>`;
     card.appendChild(m3);
 
-    if (id === "fernanda" && typeof d.vendasSDR !== "undefined") {
+    if (id === "sdr" && typeof d.vendasSDR !== "undefined") {
       const m4 = document.createElement("div");
       m4.className = "equipe-metric";
       m4.innerHTML = `<span>Vendas via SDR:</span><strong>${d.vendasSDR}</strong>`;
@@ -396,14 +396,10 @@ function setupModalVenda(){
 
     // Se for lead do SDR, soma em um contador separado da SDR (sem mexer no ranking dos vendedores)
     if (isSdrLead) {
-      const sdrEntry = Object.entries(estadoEquipe || {}).find(
-        ([id, d]) => d && typeof d.nome === "string" && d.nome.toLowerCase().includes("sdr")
-      );
-      if (sdrEntry) {
-        const [sdrId, sdrData] = sdrEntry;
-        sdrData.vendasSDR = (sdrData.vendasSDR || 0) + 1;
-        estadoEquipe[sdrId] = sdrData;
+      if (!estadoEquipe["sdr"]) {
+        estadoEquipe["sdr"] = { nome: "SDR", leads: 0, visitas: 0, vendas: 0, vendasSDR: 0 };
       }
+      estadoEquipe["sdr"].vendasSDR = (estadoEquipe["sdr"].vendasSDR || 0) + 1;
     }
 
     salvarLS(STORAGE_KEYS.equipe, estadoEquipe);
@@ -470,7 +466,7 @@ function setupConfig(){
     estadoEquipe={};
     VENDEDORES_INICIAIS.forEach(v=>{
       estadoEquipe[v.id]={nome:v.nome,leads:0,visitas:0,vendas:0};
-      if (v.nome.includes("(SDR)")) {
+      if (v.id === "sdr") {
         estadoEquipe[v.id].vendasSDR = 0;
       }
     });
@@ -511,7 +507,7 @@ function atualizarDashboard(){
   const rank=document.getElementById("dash-ranking");
   if(rank){
     const vendedoresArr = Object.entries(estadoEquipe || {})
-      .filter(([id, d]) => id !== "fernanda") // exclui SDR do ranking principal
+      .filter(([id, d]) => id !== "sdr") // exclui SDR do ranking principal
       .map(([id, d]) => d)
       .slice()
       .sort((a,b)=>(b.vendas||0)-(a.vendas||0));

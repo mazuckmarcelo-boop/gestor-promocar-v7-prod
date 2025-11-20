@@ -25,6 +25,8 @@ function mapLocalToRemoteEstado(estadoLocal) {
       nome: dados.nome || id,
       vendas: Number(dados.vendas || 0),
       leads: Number(dados.leads || 0),
+      visitas: Number(dados.visitas || 0),
+      vendasSDR: Number(dados.vendasSDR || 0),
       ativo: true,
     };
   });
@@ -43,8 +45,9 @@ async function carregarEquipeDoFirestore() {
       novoEstado[id] = {
         nome: data.nome || id,
         leads: Number(data.leads || 0),
-        visitas: (estadoAtual[id] && estadoAtual[id].visitas) || 0,
+        visitas: Number(data.visitas || 0),
         vendas: Number(data.vendas || 0),
+        vendasSDR: Number(data.vendasSDR || 0),
       };
     });
 
