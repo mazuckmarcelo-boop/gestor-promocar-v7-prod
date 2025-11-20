@@ -395,8 +395,15 @@ function setupModalVenda(){
     estadoEquipe[vendedorId].vendas = (estadoEquipe[vendedorId].vendas || 0) + 1;
 
     // Se for lead do SDR, soma em um contador separado da SDR (sem mexer no ranking dos vendedores)
-    if (isSdrLead && estadoEquipe["fernanda"]) {
-      estadoEquipe["fernanda"].vendasSDR = (estadoEquipe["fernanda"].vendasSDR || 0) + 1;
+    if (isSdrLead) {
+      const sdrEntry = Object.entries(estadoEquipe || {}).find(
+        ([id, d]) => d && typeof d.nome === "string" && d.nome.toLowerCase().includes("sdr")
+      );
+      if (sdrEntry) {
+        const [sdrId, sdrData] = sdrEntry;
+        sdrData.vendasSDR = (sdrData.vendasSDR || 0) + 1;
+        estadoEquipe[sdrId] = sdrData;
+      }
     }
 
     salvarLS(STORAGE_KEYS.equipe, estadoEquipe);
@@ -407,6 +414,29 @@ function setupModalVenda(){
     }
     estadoVendasOrigem[origem]++;
     salvarLS(STORAGE_KEYS.vendasPorOrigem, estadoVendasOrigem);
+
+    // Integração com tabela de portais: tenta localizar o portal pela origem
+    if (Array.isArray(estadoPortais)) {
+      const origemLower = String(origem).toLowerCase();
+      let portalIndex = estadoPortais.findIndex(p => p && typeof p.nome === "string" && p.nome.toLowerCase() === origemLower);
+      if (portalIndex === -1) {
+        portalIndex = estadoPortais.findIndex(p => {
+          if (!p || !p.nome) return false;
+          const nomeLower = p.nome.toLowerCase();
+          return nomeLower.includes(origemLower) || origemLower.includes(nomeLower);
+        });
+      }
+      if (portalIndex !== -1) {
+        const portal = estadoPortais[portalIndex];
+        portal.vendas = (portal.vendas || 0) + 1;
+        portal.leads = (portal.leads || 0) + 1;
+        estadoPortais[portalIndex] = portal;
+        salvarLS(STORAGE_KEYS.portais, estadoPortais);
+        if (typeof renderPortaisTabela === "function") {
+          renderPortaisTabela();
+        }
+      }
+    }
 
     fecharModal();
     renderEquipeCards();
