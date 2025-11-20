@@ -244,55 +244,173 @@ function setupPortais(){
 
 function inicializarEquipeSeVazio(){
   if(!estadoEquipe||Object.keys(estadoEquipe).length===0){
-    estadoEquipe={}; VENDEDORES_INICIAIS.forEach(v=>{estadoEquipe[v.id]={nome:v.nome,leads:0,visitas:0,vendas:0};});
+    estadoEquipe={};
+    VENDEDORES_INICIAIS.forEach(v=>{
+      estadoEquipe[v.id]={nome:v.nome,leads:0,visitas:0,vendas:0};
+      if (v.nome.includes("(SDR)")) {
+        estadoEquipe[v.id].vendasSDR = 0;
+      }
+    });
     salvarLS(STORAGE_KEYS.equipe,estadoEquipe);
   }
 }
 function calcularConversao(leads,vendas){if(!leads||leads<=0)return 0; return vendas/leads*100;}
+
 function renderEquipeCards(){
-  const c=document.getElementById("equipe-cards"); if(!c)return; c.innerHTML="";
-  Object.entries(estadoEquipe).forEach(([id,d])=>{
-    const card=document.createElement("div"); card.className="equipe-card";
-    const conv=calcularConversao(d.leads,d.vendas).toFixed(1);
-    const h=document.createElement("div"); h.className="equipe-card-header";
-    h.innerHTML=`<span>${d.nome}</span><span>${conv}% conv.</span>`; card.appendChild(h);
-    const m1=document.createElement("div"); m1.className="equipe-metric"; m1.innerHTML=`<span>Leads:</span><strong>${d.leads}</strong>`; card.appendChild(m1);
-    const m2=document.createElement("div"); m2.className="equipe-metric"; m2.innerHTML=`<span>Visitas:</span><strong>${d.visitas}</strong>`; card.appendChild(m2);
-    const m3=document.createElement("div"); m3.className="equipe-metric"; m3.innerHTML=`<span>Vendas:</span><strong>${d.vendas}</strong>`; card.appendChild(m3);
-    const actions=document.createElement("div"); actions.className="equipe-actions";
-    function botao(lbl,tipo){const b=document.createElement("button");b.className="btn-sm";b.textContent=lbl;
-      b.addEventListener("click",()=>{if(tipo==="lead")estadoEquipe[id].leads++;else if(tipo==="visita")estadoEquipe[id].visitas++;else if(tipo==="venda"){abrirModalOrigemVenda(id);return;}
-        salvarLS(STORAGE_KEYS.equipe,estadoEquipe);renderEquipeCards();atualizarDashboard();});return b;}
-    actions.appendChild(botao("+ Lead","lead"));
-    actions.appendChild(botao("+ Visita","visita"));
-    actions.appendChild(botao("+ Venda","venda"));
-    card.appendChild(actions); c.appendChild(card);
+  const c = document.getElementById("equipe-cards");
+  if (!c) return;
+  c.innerHTML = "";
+
+  Object.entries(estadoEquipe || {}).forEach(([id, d]) => {
+    const card = document.createElement("div");
+    card.className = "equipe-card";
+
+    const conv = calcularConversao(d.leads, d.vendas).toFixed(1);
+    const h = document.createElement("div");
+    h.className = "equipe-card-header";
+    h.innerHTML = `<span>${d.nome}</span><span>${conv}% conv.</span>`;
+    card.appendChild(h);
+
+    const m1 = document.createElement("div");
+    m1.className = "equipe-metric";
+    m1.innerHTML = `<span>Leads:</span><strong>${d.leads || 0}</strong>`;
+    card.appendChild(m1);
+
+    const m2 = document.createElement("div");
+    m2.className = "equipe-metric";
+    m2.innerHTML = `<span>Visitas:</span><strong>${d.visitas || 0}</strong>`;
+    card.appendChild(m2);
+
+    const m3 = document.createElement("div");
+    m3.className = "equipe-metric";
+    m3.innerHTML = `<span>Vendas:</span><strong>${d.vendas || 0}</strong>`;
+    card.appendChild(m3);
+
+    if (id === "fernanda" && typeof d.vendasSDR !== "undefined") {
+      const m4 = document.createElement("div");
+      m4.className = "equipe-metric";
+      m4.innerHTML = `<span>Vendas via SDR:</span><strong>${d.vendasSDR}</strong>`;
+      card.appendChild(m4);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "equipe-actions";
+
+    function botao(lbl, tipo) {
+      const b = document.createElement("button");
+      b.className = "btn-sm";
+      b.textContent = lbl;
+      b.addEventListener("click", () => {
+        if (tipo === "lead") {
+          d.leads = (d.leads || 0) + 1;
+        } else if (tipo === "visita") {
+          d.visitas = (d.visitas || 0) + 1;
+        } else if (tipo === "venda") {
+          abrirModalOrigemVenda(id);
+          return;
+        }
+        estadoEquipe[id] = d;
+        salvarLS(STORAGE_KEYS.equipe, estadoEquipe);
+        renderEquipeCards();
+        atualizarDashboard();
+      });
+      return b;
+    }
+
+    actions.appendChild(botao("+ Lead", "lead"));
+    actions.appendChild(botao("+ Visita", "visita"));
+    actions.appendChild(botao("+ Venda", "venda"));
+    card.appendChild(actions);
+
+    c.appendChild(card);
   });
 }
-
 let vendedorAtualParaVenda=null;
+
 function abrirModalOrigemVenda(id){
-  vendedorAtualParaVenda=id;
-  document.getElementById("modal-backdrop").classList.remove("hidden");
-  document.getElementById("modal-origem-select").value="";
-  document.getElementById("modal-origem-outro").classList.add("hidden");
+  vendedorAtualParaVenda = id;
+  const backdrop = document.getElementById("modal-backdrop");
+  const select = document.getElementById("modal-origem-select");
+  const outro = document.getElementById("modal-origem-outro");
+  const sdrSwitch = document.getElementById("modal-sdr-switch");
+
+  if (backdrop) backdrop.classList.remove("hidden");
+  if (select) select.value = "";
+  if (outro) outro.classList.add("hidden");
+  if (sdrSwitch) sdrSwitch.checked = false;
 }
+
 function fecharModal(){
   document.getElementById("modal-backdrop").classList.add("hidden");
   vendedorAtualParaVenda=null;
 }
+
 function setupModalVenda(){
-  const select=document.getElementById("modal-origem-select");
-  const outro=document.getElementById("modal-origem-outro");
-  document.getElementById("modal-cancelar").addEventListener("click",fecharModal);
-  select.addEventListener("change",()=>{if(select.value==="outro")outro.classList.remove("hidden");else outro.classList.add("hidden");});
-  document.getElementById("modal-confirmar").addEventListener("click",()=>{
-    if(!vendedorAtualParaVenda)return fecharModal();
-    let origem=select.value; if(!origem){alert("Selecione uma origem.");return;}
-    if(origem==="outro"){if(!outro.value.trim()){alert("Digite a origem.");return;} origem=outro.value.trim();}
-    estadoEquipe[vendedorAtualParaVenda].vendas++; salvarLS(STORAGE_KEYS.equipe,estadoEquipe);
-    if(!estadoVendasOrigem[origem])estadoVendasOrigem[origem]=0; estadoVendasOrigem[origem]++; salvarLS(STORAGE_KEYS.vendasPorOrigem,estadoVendasOrigem);
-    fecharModal(); renderEquipeCards(); atualizarDashboard();
+  const select = document.getElementById("modal-origem-select");
+  const outro = document.getElementById("modal-origem-outro");
+  const sdrSwitch = document.getElementById("modal-sdr-switch");
+  const btnCancelar = document.getElementById("modal-cancelar");
+  const btnConfirmar = document.getElementById("modal-confirmar");
+
+  if (!select || !outro || !btnCancelar || !btnConfirmar) return;
+
+  btnCancelar.addEventListener("click", fecharModal);
+
+  select.addEventListener("change", () => {
+    if (select.value === "outro") {
+      outro.classList.remove("hidden");
+    } else {
+      outro.classList.add("hidden");
+    }
+  });
+
+  btnConfirmar.addEventListener("click", () => {
+    if (!vendedorAtualParaVenda) {
+      fecharModal();
+      return;
+    }
+
+    let origem = select.value;
+    if (!origem) {
+      alert("Selecione uma origem.");
+      return;
+    }
+
+    if (origem === "outro") {
+      if (!outro.value.trim()) {
+        alert("Digite a origem.");
+        return;
+      }
+      origem = outro.value.trim();
+    }
+
+    const isSdrLead = sdrSwitch && sdrSwitch.checked;
+    const vendedorId = vendedorAtualParaVenda;
+
+    if (!estadoEquipe[vendedorId]) {
+      estadoEquipe[vendedorId] = { nome: vendedorId, leads: 0, visitas: 0, vendas: 0 };
+    }
+
+    // +1 venda para o vendedor
+    estadoEquipe[vendedorId].vendas = (estadoEquipe[vendedorId].vendas || 0) + 1;
+
+    // Se for lead do SDR, soma em um contador separado da SDR (sem mexer no ranking dos vendedores)
+    if (isSdrLead && estadoEquipe["fernanda"]) {
+      estadoEquipe["fernanda"].vendasSDR = (estadoEquipe["fernanda"].vendasSDR || 0) + 1;
+    }
+
+    salvarLS(STORAGE_KEYS.equipe, estadoEquipe);
+
+    // Atualiza contador por origem / portal
+    if (!estadoVendasOrigem[origem]) {
+      estadoVendasOrigem[origem] = 0;
+    }
+    estadoVendasOrigem[origem]++;
+    salvarLS(STORAGE_KEYS.vendasPorOrigem, estadoVendasOrigem);
+
+    fecharModal();
+    renderEquipeCards();
+    atualizarDashboard();
   });
 }
 
@@ -319,7 +437,13 @@ function setupConfig(){
   });
   if(btnResetEquipe)btnResetEquipe.addEventListener("click",()=>{
     if(!confirm("Resetar números da equipe?"))return;
-    estadoEquipe={}; VENDEDORES_INICIAIS.forEach(v=>{estadoEquipe[v.id]={nome:v.nome,leads:0,visitas:0,vendas:0};});
+    estadoEquipe={};
+    VENDEDORES_INICIAIS.forEach(v=>{
+      estadoEquipe[v.id]={nome:v.nome,leads:0,visitas:0,vendas:0};
+      if (v.nome.includes("(SDR)")) {
+        estadoEquipe[v.id].vendasSDR = 0;
+      }
+    });
     estadoVendasOrigem={}; salvarLS(STORAGE_KEYS.equipe,estadoEquipe); salvarLS(STORAGE_KEYS.vendasPorOrigem,estadoVendasOrigem);
     renderEquipeCards(); atualizarDashboard();
   });
@@ -356,8 +480,14 @@ function atualizarDashboard(){
 
   const rank=document.getElementById("dash-ranking");
   if(rank){
-    const arr=Object.values(estadoEquipe).slice().sort((a,b)=>(b.vendas||0)-(a.vendas||0));
-    rank.innerHTML=""; arr.slice(0,4).forEach((d,i)=>{
+    const vendedoresArr = Object.entries(estadoEquipe || {})
+      .filter(([id, d]) => id !== "fernanda") // exclui SDR do ranking principal
+      .map(([id, d]) => d)
+      .slice()
+      .sort((a,b)=>(b.vendas||0)-(a.vendas||0));
+
+    rank.innerHTML="";
+    vendedoresArr.slice(0,4).forEach((d,i)=>{
       const li=document.createElement("li");
       const emoji=i===0?"🥇":i===1?"🥈":i===2?"🥉":"🏅";
       const conv=calcularConversao(d.leads,d.vendas).toFixed(1);
@@ -367,7 +497,8 @@ function atualizarDashboard(){
   }
 
 
-  const dashPort=document.getElementById("dash-portais");
+
+const dashPort=document.getElementById("dash-portais");
   const dashTotal=document.getElementById("dash-portais-total");
   if(dashPort){
     dashPort.innerHTML="";

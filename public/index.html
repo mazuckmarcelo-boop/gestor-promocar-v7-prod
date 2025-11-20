@@ -299,6 +299,18 @@ if(!localStorage.getItem('gp_logged_in')){ window.location='login.html'; }
         <option value="outro">Outro (digitar)</option>
       </select>
       <input id="modal-origem-outro" class="hidden" type="text" placeholder="Digite a origem" />
+
+      <div class="modal-sdr-row">
+        <div class="modal-sdr-text">
+          <strong>Foi lead do SDR?</strong>
+          <small>Se sim, conta para o SDR e mantém o ranking só dos vendedores.</small>
+        </div>
+        <label class="sdr-switch">
+          <input type="checkbox" id="modal-sdr-switch" />
+          <span class="sdr-slider"></span>
+        </label>
+      </div>
+
       <div class="modal-actions">
         <button id="modal-cancelar" class="btn-outline">Cancelar</button>
         <button id="modal-confirmar" class="btn">Confirmar</button>

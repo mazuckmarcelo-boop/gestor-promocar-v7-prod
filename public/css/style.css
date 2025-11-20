@@ -213,3 +213,64 @@ body{
 /* Export button */
 .export-btn{float:right;margin:10px 0;padding:8px 14px;background:#c40000;color:#fff;border:none;border-radius:6px;cursor:pointer;}
 .export-btn:hover{background:#a30000;}
+
+
+/* SDR switch inside modal */
+.modal-sdr-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:6px 0 10px;
+}
+.modal-sdr-text{
+  display:flex;
+  flex-direction:column;
+  font-size:11px;
+}
+.modal-sdr-text strong{
+  font-size:12px;
+}
+.modal-sdr-text small{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.sdr-switch{
+  position:relative;
+  display:inline-block;
+  width:40px;
+  height:20px;
+}
+.sdr-switch input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+.sdr-slider{
+  position:absolute;
+  cursor:pointer;
+  inset:0;
+  background:#111827;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.8);
+  transition:.2s;
+}
+.sdr-slider:before{
+  position:absolute;
+  content:"";
+  height:14px;
+  width:14px;
+  left:2px;
+  top:2px;
+  background:#e5e7eb;
+  border-radius:999px;
+  transition:.2s;
+}
+.sdr-switch input:checked + .sdr-slider{
+  background:#22c55e;
+  border-color:#22c55e;
+}
+.sdr-switch input:checked + .sdr-slider:before{
+  transform:translateX(18px);
+}
