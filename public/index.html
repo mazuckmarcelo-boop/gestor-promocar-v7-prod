@@ -12,17 +12,26 @@ if(!localStorage.getItem('gp_logged_in')){ window.location='login.html'; }
 </head>
 <body>
   <header class="app-header">
-    <div class="app-logo">
-      <span class="app-logo-mark">P</span>
-      <span class="app-logo-text">Gestor Promocar</span>
+    <div class="app-header-left">
+      <img src="assets/logo-promocar.png" alt="Promocar" class="app-logo" />
+      <div>
+        <div class="app-title">Gestor Promocar</div>
+        <div class="metric-label">Visão geral de performance</div>
+      </div>
     </div>
-    <div class="app-header-info">
-      <div id="header-date"></div>
-      <div id="header-time"></div>
+    <div class="app-header-right">
+      <div class="header-pill">
+        <span class="metric-label">Data</span>
+        <span id="header-date"></span>
+      </div>
+      <div class="header-pill">
+        <span class="metric-label">Hora</span>
+        <span id="header-time"></span>
+      </div>
     </div>
   </header>
 
-  <main id="view-dashboard" class="view active-view">
+  <main id="view-dashboard" class="view active-view page-inner">
     <section class="grid-2">
       <div class="card">
         <div class="card-title">

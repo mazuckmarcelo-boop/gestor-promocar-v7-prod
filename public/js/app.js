@@ -343,6 +343,9 @@ function renderEquipeCards(){
         }
         estadoEquipe[id] = d;
         salvarLS(STORAGE_KEYS.equipe, estadoEquipe);
+        if (typeof salvarEquipeNoFirestore === "function") {
+          salvarEquipeNoFirestore();
+        }
         renderEquipeCards();
         atualizarDashboard();
       });
@@ -464,6 +467,14 @@ function setupModalVenda(){
           renderPortaisTabela();
         }
       }
+    }
+
+    // Sincroniza imediatamente com Firestore
+    if (typeof salvarEquipeNoFirestore === "function") {
+      salvarEquipeNoFirestore();
+    }
+    if (typeof salvarPortaisNoFirestore === "function") {
+      salvarPortaisNoFirestore();
     }
 
     fecharModal();
