@@ -71,7 +71,23 @@ window.__gpSetEstadoRotina = function (novoEstado) {
 
 let estadoVideos = lerLS(STORAGE_KEYS.videos, {});
 let estadoAnuncios = lerLS(STORAGE_KEYS.anuncios, {});
+
 let estadoPortais = lerLS(STORAGE_KEYS.portais, []);
+
+// Helpers globais para integração dos portais com Firebase
+window.__gpGetPortaisEstado = function () {
+  return Array.isArray(estadoPortais) ? [...estadoPortais] : [];
+};
+window.__gpSetPortaisEstado = function (novos) {
+  estadoPortais = Array.isArray(novos) ? novos : [];
+  salvarLS(STORAGE_KEYS.portais, estadoPortais);
+  if (typeof renderPortaisTabela === "function") {
+    renderPortaisTabela();
+  }
+  if (typeof atualizarDashboard === "function") {
+    atualizarDashboard();
+  }
+};
 
 let estadoEquipe = lerLS(STORAGE_KEYS.equipe, {});
 
@@ -154,10 +170,26 @@ function setupAnuncios(){
   });
 }
 
+
 function inicializarPortaisSeVazio(){
-  if(!estadoPortais||estadoPortais.length===0){
-    estadoPortais=PORTAIS_PADRAO.map(n=>({id:n.toLowerCase().replace(/\s+/g,"-"),nome:n,custo:0,vencimento:"",leads:0,vendas:0}));
-    salvarLS(STORAGE_KEYS.portais,estadoPortais);
+  if(!estadoPortais || estadoPortais.length === 0){
+    estadoPortais = PORTAIS_PADRAO.map(n => {
+      const id = n
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      return {
+        id,
+        nome: n,
+        custo: 0,
+        vencimento: "",
+        leads: 0,
+        vendas: 0,
+        pago: false
+      };
+    });
+    salvarLS(STORAGE_KEYS.portais, estadoPortais);
   }
 }
 
