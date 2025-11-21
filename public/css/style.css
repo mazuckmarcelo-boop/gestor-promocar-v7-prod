@@ -276,169 +276,93 @@ body{
 }
 
 
-/* === PROMOCAR PREMIUM THEME === */
+/* === Supreme CRM overrides === */
 
 
-/* ==== PROMOCAR PREMIUM HEADER ==== */
-.app-header {
+/* === Supreme CRM Sidebar === */
+body {
+  padding-left: 76px;
+}
+
+.side-nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 76px;
+  background: #020617;
+  border-right: 1px solid rgba(148,163,184,0.45);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
-  background: linear-gradient(90deg, #8b0000, #b30000, #1a1a1f);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
-  position: sticky;
-  top: 0;
+  padding: 10px 6px;
+  gap: 6px;
   z-index: 40;
 }
 
-.app-header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.app-logo {
-  height: 42px;
-  max-width: 180px;
-  object-fit: contain;
-}
-
-.app-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.9;
-}
-
-.app-header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.85rem;
-  opacity: 0.85;
-}
-
-/* Quick stats pills */
-.header-pill {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.05);
-  backdrop-filter: blur(14px);
-}
-
-/* ==== PREMIUM GLASS BACKGROUND ==== */
-body {
-  background: radial-gradient(circle at top, #222633 0, #050509 40%, #000 100%) fixed;
-}
-
-/* Optional subtle city overlay feel */
-.page-inner {
-  position: relative;
-  padding: 16px;
-}
-
-.page-inner::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: linear-gradient(to bottom, rgba(255,255,255,0.02), rgba(0,0,0,0.8));
-  opacity: 0.5;
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* ==== GLASS CARDS ==== */
-.card, .home-card, .dashboard-grid > div, .equipe-card, .portais-card, .meta-card {
-  background: linear-gradient(135deg, rgba(13,13,18,0.90), rgba(13,13,18,0.75));
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.04);
-  box-shadow:
-    0 18px 45px rgba(0,0,0,0.8),
-    0 0 0 1px rgba(255,255,255,0.02);
-  backdrop-filter: blur(18px);
-}
-
-/* Hover lift for important cards */
-.equipe-card,
-.portais-card,
-.meta-card,
-.home-card {
-  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, border-color 0.18s ease-out;
-}
-
-.equipe-card:hover,
-.portais-card:hover,
-.meta-card:hover,
-.home-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 26px 55px rgba(0,0,0,0.95),
-    0 0 0 1px rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.12);
-}
-
-/* ==== BUTTONS PREMIUM ==== */
-button, .btn, .btn-sm, .nav-btn {
-  border-radius: 999px !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  background: radial-gradient(circle at top left, #ff3355, #b30000 55%, #330000 100%) !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-  padding-inline: 14px;
-}
-
-button:hover, .btn:hover, .btn-sm:hover, .nav-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 35px rgba(0,0,0,0.9);
-}
-
-/* SDR switch row */
-.modal-sdr-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 12px;
-  padding: 10px 12px;
+.side-nav .nav-btn {
+  width: 100%;
   border-radius: 12px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
+  background: transparent;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease-out, color 0.15s ease-out, transform 0.12s ease-out;
 }
 
-/* Dashboard headline */
-.dashboard-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  opacity: 0.9;
+.side-nav .nav-btn span {
+  font-size: 18px;
 }
 
-/* Subtle metric label */
-.metric-label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  opacity: 0.65;
+.side-nav .nav-btn small {
+  font-size: 9px;
 }
 
-/* Metric value big */
-.metric-value {
-  font-size: 1.7rem;
-  font-weight: 700;
+.side-nav .nav-btn.active-nav {
+  background: #0b1120;
+  color: #f9fafb;
+  box-shadow: 0 0 0 1px rgba(248,113,113,0.7);
+  transform: translateY(-1px);
 }
 
-/* Simple responsive tweak */
-@media (max-width: 768px) {
-  .app-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .app-header-left {
-    width: 100%;
-    justify-content: space-between;
-  }
+/* Remove old bottom-nav if ainda existir em algum HTML */
+.bottom-nav {
+  display: none !important;
+}
+
+/* Logo header refinement */
+.app-logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+/* soften header gradient a bit */
+.app-header{
+  background: linear-gradient(90deg,#111827 0%,#020617 70%,#020617 100%);
+  border-bottom: 1px solid rgba(148,163,184,0.4);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+}
+
+/* Cards mais flat, menos "vidro" */
+.card{
+  background: #020617;
+  border-radius: 14px;
+  border: 1px solid rgba(31,41,55,0.9);
+  box-shadow: 0 16px 30px rgba(0,0,0,0.75);
+}
+
+/* Botões mais sóbrios */
+.btn,.btn-outline,.btn-outline-danger,.btn-sm{
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.65);
+}
+
+/* Login logo tweak */
+.login-card .app-logo-img {
+  margin-bottom: 12px;
 }
