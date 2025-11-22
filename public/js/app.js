@@ -1,3 +1,9 @@
+
+// auto sync every 30s
+setInterval(()=>{
+ if(typeof salvarEquipeNoFirestore==='function') salvarEquipeNoFirestore();
+ if(typeof salvarPortaisNoFirestore==='function') salvarPortaisNoFirestore();
+},30000);
 if(!localStorage.getItem("gp_logged_in")){ window.location="login.html"; }
 // JS principal do Gestor Promocar v6 (resumido)
 
